@@ -77,8 +77,16 @@ var cardType = new GraphQLObjectType({
 /**
  * Define your own connection types here
  */
-var {connectionType: cardConnection} =
-  connectionDefinitions({nodeType: cardType});
+var {connectionType: cardConnection} = connectionDefinitions({
+  name: 'Card',
+  nodeType: cardType,
+  connectionFields: () => ({
+    total: {
+      type: GraphQLInt,
+      resolve: (conn) => conn.edges.length
+    }
+  })
+});
 
 /**
  * This is the type that will be the root of our query,

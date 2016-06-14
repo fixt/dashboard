@@ -6,6 +6,15 @@ class App extends React.Component {
     return (
       <div>
         <h1>Card list</h1>
+        <h2>
+          Total:
+          { this.props.cards.total }
+        </h2>
+        <h2>
+          Uncompleted:
+          { this.props.cards.edges.filter(edge => edge.node.status == 'backlog').length }
+        </h2>
+
         <ul>
           {this.props.cards.edges.map(edge =>
             <li key={edge.node.id}>{edge.node.title} (ID: {edge.node.id})</li>
@@ -16,18 +25,25 @@ class App extends React.Component {
   }
 }
 
+const cardFragment = Relay.QL`
+  fragment on Card {
+    id,
+    title,
+    description,
+    status,
+  }
+`
+
 export default Relay.createContainer(App, {
   fragments: {
-    viewer: () => Relay.QL`
-      fragment on User {
-        widgets(first: 10) {
-          edges {
-            node {
-              id,
-              name,
-            },
-          },
+    cards: () => Relay.QL`
+      fragment on CardConnection {
+        edges {
+          node {
+            ${cardFragment}
+          }
         },
+        total,
       }
     `,
   },
