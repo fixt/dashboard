@@ -83,7 +83,9 @@ var {connectionType: cardConnection} = connectionDefinitions({
   connectionFields: () => ({
     total: {
       type: GraphQLInt,
-      resolve: (conn) => conn.edges.length
+      resolve: (conn) => {
+        return conn.totalCount
+      }
     }
   })
 });
@@ -99,8 +101,15 @@ var queryType = new GraphQLObjectType({
     // Add your own root fields here
     cards: {
       type: cardConnection,
-      resolve: (_, args) => connectionFromPromisedArray(getSprintlyCards(), args),
-    },
+      args: connectionArgs,
+      resolve: async (_, args) => {
+        var { objects, totalCount } = await getSprintlyCards(args)
+        return {
+          ...connectionFromArray(objects, args),
+          totalCount
+        }
+      },
+    }
   }),
 });
 

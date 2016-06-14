@@ -46,12 +46,13 @@ export class Card {
   }
 }
 
-
 export function getSprintlyCard(id) {
   return new Card()
 }
 
-export function getSprintlyCards() {
-  return sprintlyRequest('items.json')
-    .then(items => items.map(item => new Card(item)))
+export async function getSprintlyCards() {
+  const items = await sprintlyRequest('items.json')
+  const objects = items.map(item => new Card(item))
+
+  return { objects, totalCount: items.length }
 }
